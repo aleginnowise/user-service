@@ -13,6 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 @Entity
 @Table(name = "card_info")
 @AllArgsConstructor
@@ -21,9 +24,8 @@ import lombok.Setter;
 @Setter
 public class Card {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,6 +37,6 @@ public class Card {
     @Column(nullable = false)
     private String holder;
 
-    @Column(nullable = false, length = 5)
-    private String expirationDate;
+    @Column(nullable = false)
+    private LocalDate expirationDate;
 }
