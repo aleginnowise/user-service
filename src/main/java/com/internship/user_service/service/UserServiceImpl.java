@@ -1,6 +1,7 @@
 package com.internship.user_service.service;
 
 import com.internship.user_service.dto.UserDTO;
+import com.internship.user_service.exception.custom_exceptions.UserNotFoundException;
 import com.internship.user_service.mapper.UserMapper;
 import com.internship.user_service.model.User;
 import com.internship.user_service.repository.UserRepository;
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUser(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " does not exist"));
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
 
         return userMapper.userToUserDTO(user);
     }
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User with email " + email + " does not exist"));
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " does not exist"));
 
         return userMapper.userToUserDTO(user);
     }
@@ -59,16 +60,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(UUID id, UserDTO userDTO) {
         User user = userMapper.userDTOToUser(userDTO);
-        User updatedUser = userRepository.findById(id)
-                .map(repoUser -> {
-                    repoUser.setName(user.getName());
-                    repoUser.setSurname(user.getSurname());
-                    repoUser.setBirthDate(user.getBirthDate());
-                    repoUser.setEmail(user.getEmail());
-                    repoUser.setCards(user.getCards());
-                    return userRepository.save(repoUser);
-                })
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " does not exist"));
+        User updatedUser = userFromRepository(id, user);
 
         return userMapper.userToUserDTO(updatedUser);
     }
@@ -77,7 +69,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " does not exist"));
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
         userRepository.delete(user);
+    }
+
+    private User userFromRepository(UUID id, User user){
+        return userRepository.findById(id)
+                .map(repoUser -> {
+                    repoUser.setName(user.getName());
+                    repoUser.setSurname(user.getSurname());
+                    repoUser.setBirthDate(user.getBirthDate());
+                    repoUser.setEmail(user.getEmail());
+                    repoUser.setCards(user.getCards());
+                    return userRepository.save(repoUser);
+                })
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
     }
 }

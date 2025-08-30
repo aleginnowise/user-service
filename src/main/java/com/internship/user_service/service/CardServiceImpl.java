@@ -1,6 +1,7 @@
 package com.internship.user_service.service;
 
 import com.internship.user_service.dto.CardDTO;
+import com.internship.user_service.exception.custom_exceptions.CardNotFoundException;
 import com.internship.user_service.mapper.CardMapper;
 import com.internship.user_service.model.Card;
 import com.internship.user_service.repository.CardRepository;
@@ -33,7 +34,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardDTO getCard(UUID id) {
         Card card = cardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
+                .orElseThrow(() -> new CardNotFoundException("Card with id " + id + " does not exist"));
 
         return cardMapper.cardToCardDTO(card);
     }
@@ -51,15 +52,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public CardDTO updateCard(UUID id, CardDTO cardDTO) {
         Card card = cardMapper.cardDTOToCard(cardDTO);
-        Card updatedCard = cardRepository.findById(id)
-                .map(repoCard -> {
-                    repoCard.setUser(card.getUser());
-                    repoCard.setNumber(card.getNumber());
-                    repoCard.setHolder(card.getHolder());
-                    repoCard.setExpirationDate(card.getExpirationDate());
-                    return cardRepository.save(repoCard);
-                })
-                .orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
+        Card updatedCard = cardFromRepository(id, card);
 
         return cardMapper.cardToCardDTO(updatedCard);
     }
@@ -68,7 +61,19 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public void deleteCard(UUID id) {
         Card card = cardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
+                .orElseThrow(() -> new CardNotFoundException("Card with id " + id + " does not exist"));
         cardRepository.delete(card);
+    }
+
+    private Card cardFromRepository(UUID id, Card card) {
+        return cardRepository.findById(id)
+                .map(repoCard -> {
+                    repoCard.setUser(card.getUser());
+                    repoCard.setNumber(card.getNumber());
+                    repoCard.setHolder(card.getHolder());
+                    repoCard.setExpirationDate(card.getExpirationDate());
+                    return cardRepository.save(repoCard);
+                })
+                .orElseThrow(() -> new CardNotFoundException("Card with id " + id + " does not exist"));
     }
 }
