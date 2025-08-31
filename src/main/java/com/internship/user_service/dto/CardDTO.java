@@ -1,5 +1,6 @@
 package com.internship.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.NotBlank;
@@ -34,5 +35,6 @@ public class CardDTO {
 
     @NotNull(message = "Expiration date may not be null")
     @Future(message = "Expiration date must be in future")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate expirationDate;
 }

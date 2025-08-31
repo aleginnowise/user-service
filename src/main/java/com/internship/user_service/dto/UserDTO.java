@@ -1,5 +1,6 @@
 package com.internship.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.NotBlank;
@@ -33,6 +34,7 @@ public class UserDTO {
 
     @NotNull(message = "Birth date may not be null")
     @Past(message = "Birth date must be in the past")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
     @NotBlank(message = "Email may not be blank")

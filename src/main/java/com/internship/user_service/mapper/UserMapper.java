@@ -4,7 +4,7 @@ import com.internship.user_service.dto.UserDTO;
 import com.internship.user_service.model.User;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CardMapper.class})
 public interface UserMapper {
     User userDTOToUser(UserDTO userDTO);
     UserDTO userToUserDTO(User user);
