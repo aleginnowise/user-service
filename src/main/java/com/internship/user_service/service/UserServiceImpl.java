@@ -72,7 +72,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUser(UUID id, UserDTO userDTO) {
-        // fetch old email for eviction if changed
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
         String oldEmail = existing.getEmail();
@@ -81,13 +80,11 @@ public class UserServiceImpl implements UserService {
         User updatedUser = userFromRepository(id, user);
         UserDTO updatedDto = userMapper.userToUserDTO(updatedUser);
 
-        // update id cache
         Cache idCache = cacheManager.getCache("userById");
         if (idCache != null) {
             idCache.put(id, updatedDto);
         }
 
-        // manage email cache
         Cache emailCache = cacheManager.getCache("userByEmail");
         if (emailCache != null) {
             if (oldEmail != null && !oldEmail.equals(updatedDto.getEmail())) {
@@ -106,7 +103,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
         userRepository.delete(user);
 
-        // evict caches
         Cache idCache = cacheManager.getCache("userById");
         if (idCache != null) {
             idCache.evict(id);
