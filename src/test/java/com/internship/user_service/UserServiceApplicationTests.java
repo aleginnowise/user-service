@@ -10,6 +10,7 @@ import com.internship.user_service.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@Transactional
 class UserServiceApplicationTests {
 
     UserMapper userMapper;
@@ -53,8 +55,14 @@ class UserServiceApplicationTests {
 
     @Test
     public void givenCardDTOToCard_whenMaps_thenCorrect(){
-        User user = userMapper.userDTOToUser(userService.getUserByEmail("101FM@mail.com"));
-        UUID uId = user.getId();
+        UserDTO userDTO = new UserDTO();
+        userDTO.setName("JPEG");
+        userDTO.setSurname("101");
+        userDTO.setBirthDate(LocalDate.of(2025, Month.JANUARY, 1));
+        userDTO.setEmail("101FM_card_test@mail.com");
+        
+        UserDTO createdUserDTO = userService.createUser(userDTO);
+        UUID uId = createdUserDTO.getId();
 
         CardDTO cardDTO = new CardDTO();
         cardDTO.setUserId(uId);
