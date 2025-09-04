@@ -1,10 +1,11 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /workspace
-COPY gradlew gradlew.bat settings.gradle build.gradle ./
+COPY gradlew settings.gradle build.gradle ./
 COPY gradle gradle
-RUN gradlew.bat --version || ./gradlew --version
+RUN chmod +x gradlew
+RUN ./gradlew --version
 COPY src src
-RUN gradlew.bat clean bootJar -x test || ./gradlew clean bootJar -x test
+RUN ./gradlew clean bootJar -x test
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
