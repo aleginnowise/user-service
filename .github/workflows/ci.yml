@@ -85,6 +85,8 @@ jobs:
           cache: gradle
       - name: Make gradlew executable
         run: chmod +x gradlew
+      - name: Compile classes for Sonar analysis
+        run: ./gradlew --no-daemon classes
       - name: SonarQube Scan
         env:
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
